@@ -1,0 +1,71 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Журнал звонков</title>
+    <link rel="stylesheet" href="{% static 'calls/style.css' %}">
+</head>
+<body>
+    <h1>Журнал звонков</h1>
+
+    <form method="get" class="filters">
+        <input type="text" name="from_ip" placeholder="From IP" value="{{ filters.from_ip }}">
+        <input type="text" name="to_ip" placeholder="To IP" value="{{ filters.to_ip }}">
+        <input type="text" name="call_id" placeholder="Call ID" value="{{ filters.call_id }}">
+        <input type="text" name="from_number" placeholder="Номер отправителя" value="{{ filters.from_number }}">
+        <input type="text" name="to_number" placeholder="Номер получателя" value="{{ filters.to_number }}">
+        <input type="date" name="date_from" value="{{ filters.date_from }}">
+        <input type="date" name="date_to" value="{{ filters.date_to }}">
+        <button type="submit">Найти</button>
+        <a href="{% url 'calls:call_list' %}" class="reset-link">Сбросить</a>
+    </form>
+
+    <p class="meta">Найдено записей: {{ page.paginator.count }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>From IP</th>
+                <th>To IP</th>
+                <th>Call ID</th>
+                <th>Номер отправителя</th>
+                <th>Номер получателя</th>
+                <th>Дата</th>
+                <th>Время</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for call in page %}
+            <tr>
+                <td>{{ call.id }}</td>
+                <td>{{ call.from_ip|default:'' }}</td>
+                <td>{{ call.to_ip|default:'' }}</td>
+                <td>{{ call.call_id|default:'' }}</td>
+                <td>{{ call.from_number|default:'' }}</td>
+                <td>{{ call.to_number|default:'' }}</td>
+                <td>{{ call.calling_date|date:'d.m.Y'|default:'' }}</td>
+                <td>{{ call.calling_time|time:'H:i:s'|default:'' }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="empty">Ничего не найдено</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page.has_other_pages %}
+    <div class="pagination">
+        {% if page.has_previous %}
+            <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page.previous_page_number }}">← Назад</a>
+        {% endif %}
+        <span>Стр. {{ page.number }} из {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}
+            <a href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page.next_page_number }}">Вперёд →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>
