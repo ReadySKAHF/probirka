@@ -12,9 +12,15 @@
     <form method="get" class="filters">
         <input type="text" name="from_ip" placeholder="From IP" value="{{ filters.from_ip }}">
         <input type="text" name="to_ip" placeholder="To IP" value="{{ filters.to_ip }}">
-        <input type="text" name="call_id" placeholder="Call ID" value="{{ filters.call_id }}">
-        <input type="text" name="from_number" placeholder="Номер отправителя" value="{{ filters.from_number }}">
-        <input type="text" name="to_number" placeholder="Номер получателя" value="{{ filters.to_number }}">
+        <input type="text" name="call_id" placeholder="Call ID"
+               title="Точное значение; маски: 7856* (начало), *6345 (конец), *785* (содержит); несколько: &quot;a&quot;;&quot;b*&quot;"
+               value="{{ filters.call_id }}">
+        <input type="text" name="from_number" placeholder="Номер отправителя"
+               title="Точное значение; маски: 7856* (начало), *6345 (конец), *785* (содержит); несколько: &quot;a&quot;;&quot;b*&quot;"
+               value="{{ filters.from_number }}">
+        <input type="text" name="to_number" placeholder="Номер получателя"
+               title="Точное значение; маски: 7856* (начало), *6345 (конец), *785* (содержит); несколько: &quot;a&quot;;&quot;b*&quot;"
+               value="{{ filters.to_number }}">
         <input type="date" name="date_from" value="{{ filters.date_from }}">
         <input type="date" name="date_to" value="{{ filters.date_to }}">
         <button type="submit">Найти</button>

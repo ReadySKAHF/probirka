@@ -2,18 +2,25 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 
 from .models import Call
+from .search import build_search_q
 
-TEXT_FILTERS = ('from_ip', 'to_ip', 'call_id', 'from_number', 'to_number')
+SUBSTRING_FILTERS = ('from_ip', 'to_ip')
+MASK_FILTERS = ('call_id', 'from_number', 'to_number')
 PER_PAGE = 50
 
 
 def call_list(request):
     calls = Call.objects.all()
 
-    for field in TEXT_FILTERS:
+    for field in SUBSTRING_FILTERS:
         value = request.GET.get(field, '').strip()
         if value:
             calls = calls.filter(**{f'{field}__icontains': value})
+
+    for field in MASK_FILTERS:
+        value = request.GET.get(field, '').strip()
+        if value:
+            calls = calls.filter(build_search_q(field, value))
 
     date_from = request.GET.get('date_from', '').strip()
     if date_from:
