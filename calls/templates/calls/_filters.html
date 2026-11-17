@@ -1,0 +1,76 @@
+<aside class="sidebar">
+    <form method="get" id="filter-form" class="filters">
+        {% if sort %}
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="dir" value="{{ direction }}">
+        {% endif %}
+
+        <section class="filter-group">
+            <h3>Номера</h3>
+            <label>Номер (любая сторона)
+                <input type="text" name="number" value="{{ filters.number }}">
+            </label>
+            <label>Отправитель
+                <input type="text" name="from_number" value="{{ filters.from_number }}">
+            </label>
+            <label>Получатель
+                <input type="text" name="to_number" value="{{ filters.to_number }}">
+            </label>
+            <label>Call ID
+                <input type="text" name="call_id" value="{{ filters.call_id }}">
+            </label>
+            <details class="help">
+                <summary>Синтаксис масок</summary>
+                <ul>
+                    <li><code>7856*</code> начинается с</li>
+                    <li><code>*6345</code> заканчивается на</li>
+                    <li><code>*785*</code> содержит</li>
+                    <li><code>4564566</code> точно</li>
+                    <li><code>"a";"*b"</code> любое из (ИЛИ)</li>
+                </ul>
+            </details>
+        </section>
+
+        <section class="filter-group">
+            <h3>Сеть</h3>
+            <label>From IP
+                <input type="text" name="from_ip" value="{{ filters.from_ip }}">
+            </label>
+            <label>To IP
+                <input type="text" name="to_ip" value="{{ filters.to_ip }}">
+            </label>
+        </section>
+
+        <section class="filter-group">
+            <h3>Период</h3>
+            <div class="periods">
+                {% for p in periods %}
+                    <a href="{{ p.url }}" class="pill{% if p.active %} is-active{% endif %}">{{ p.label }}</a>
+                {% endfor %}
+            </div>
+            <div class="row-2">
+                <label>Дата с
+                    <input type="date" name="date_from" value="{{ filters.date_from }}">
+                </label>
+                <label>по
+                    <input type="date" name="date_to" value="{{ filters.date_to }}">
+                </label>
+            </div>
+            <div class="row-2">
+                <label>Время с
+                    <input type="time" step="1" name="time_from" value="{{ filters.time_from }}">
+                </label>
+                <label>по
+                    <input type="time" step="1" name="time_to" value="{{ filters.time_to }}">
+                </label>
+            </div>
+        </section>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">
+                <svg class="icon"><use href="#i-search"/></svg> Найти
+            </button>
+            <a href="?" class="btn">Сбросить</a>
+        </div>
+    </form>
+</aside>

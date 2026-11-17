@@ -1,0 +1,96 @@
+{% load static %}<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Журнал звонков{% endblock %}</title>
+    <script>
+        // До отрисовки, чтобы тема не мигала при загрузке
+        (function () {
+            try {
+                var d = document.documentElement;
+                d.dataset.theme = localStorage.getItem('cv.theme') || 'light';
+                if (localStorage.getItem('cv.sidebar') === 'collapsed') d.classList.add('sidebar-collapsed');
+            } catch (e) {}
+        }());
+    </script>
+    <link rel="stylesheet" href="{% static 'calls/style.css' %}">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+        <symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+        <symbol id="i-columns" viewBox="0 0 24 24"><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+        <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    </svg>
+
+    <div class="loading-bar" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <button type="button" class="icon-btn" data-action="toggle-sidebar" title="Фильтры">
+            <svg class="icon"><use href="#i-filter"/></svg>
+        </button>
+        <a class="brand" href="{% url 'calls:call_list' %}">
+            <span class="brand-name">Журнал биллингов</span>
+        </a>
+        <label class="quick-search">
+            <svg class="icon"><use href="#i-search"/></svg>
+            <input type="search" name="q" form="filter-form" value="{{ filters.q }}"
+                   placeholder="Номер, Call ID или IP…" autocomplete="off">
+            <kbd>/</kbd>
+        </label>
+        <div class="topbar-actions">
+            <button type="button" class="icon-btn" data-action="toggle-theme" title="Тема">
+                <svg class="icon theme-light"><use href="#i-moon"/></svg>
+                <svg class="icon theme-dark"><use href="#i-sun"/></svg>
+            </button>
+            <button type="button" class="icon-btn" data-action="show-help" title="Горячие клавиши (?)">
+                <svg class="icon"><use href="#i-help"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="layout">
+        {% include 'calls/_filters.html' %}
+        <div class="sidebar-backdrop" data-action="toggle-sidebar"></div>
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <aside class="drawer" aria-hidden="true">
+        <div class="drawer-head">
+            <h2>Карточка звонка</h2>
+            <button type="button" class="icon-btn" data-action="close-drawer" title="Закрыть (Esc)">
+                <svg class="icon"><use href="#i-x"/></svg>
+            </button>
+        </div>
+        <div class="drawer-body"></div>
+    </aside>
+
+    <dialog class="help-dialog">
+        <h2>Горячие клавиши</h2>
+        <dl>
+            <dt><kbd>/</kbd></dt><dd>Быстрый поиск</dd>
+            <dt><kbd>j</kbd> <kbd>k</kbd></dt><dd>Следующая / предыдущая строка</dd>
+            <dt><kbd>Enter</kbd></dt><dd>Открыть карточку звонка</dd>
+            <dt><kbd>Esc</kbd></dt><dd>Закрыть карточку / окно</dd>
+            <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Предыдущая / следующая страница</dd>
+            <dt><kbd>f</kbd></dt><dd>Показать / скрыть фильтры</dd>
+            <dt><kbd>?</kbd></dt><dd>Эта подсказка</dd>
+        </dl>
+        <form method="dialog"><button class="btn">Понятно</button></form>
+    </dialog>
+
+    <div class="toasts" aria-live="polite"></div>
+
+    <script src="{% static 'calls/app.js' %}"></script>
+</body>
+</html>
