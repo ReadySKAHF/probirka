@@ -1,0 +1,35 @@
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+    CREATE TABLE IF NOT EXISTS calls (
+        id            bigserial    PRIMARY KEY,
+        from_ip       varchar(45),
+        to_ip         varchar(45),
+        call_id       varchar(64),
+        from_number   varchar(32),
+        to_number     varchar(32),
+        calling_date  date,
+        calling_time  time
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_calls_call_id      ON calls (call_id);
+    CREATE INDEX IF NOT EXISTS idx_calls_from_number  ON calls (from_number);
+    CREATE INDEX IF NOT EXISTS idx_calls_to_number    ON calls (to_number);
+    CREATE INDEX IF NOT EXISTS idx_calls_calling_date ON calls (calling_date);
+
+    CREATE INDEX IF NOT EXISTS idx_calls_call_id_trgm
+        ON calls USING gin (call_id gin_trgm_ops);
+    CREATE INDEX IF NOT EXISTS idx_calls_from_number_trgm
+        ON calls USING gin (from_number gin_trgm_ops);
+    CREATE INDEX IF NOT EXISTS idx_calls_to_number_trgm
+        ON calls USING gin (to_number gin_trgm_ops);
+
+    CREATE INDEX IF NOT EXISTS idx_calls_from_ip_trgm
+        ON calls USING gin (from_ip gin_trgm_ops);
+    CREATE INDEX IF NOT EXISTS idx_calls_to_ip_trgm
+        ON calls USING gin (to_ip gin_trgm_ops);
+
+Из папки проекта:
+    venv\Scripts\python.exe manage.py migrate
+
+Обновить статистику планировщика, иначе первые запросы могут быть медленными:
+    ANALYZE calls;
